@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  webserv:
+    container_name: webserv
+    image: webserv
+    build: .
+    expose:
+      - "80"
+    volumes:
+      - webserv_vol:/webserv
+    restart: "no"
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+
+volumes:
+    webserv_vol:
+      external: true
