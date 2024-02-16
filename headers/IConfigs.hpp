@@ -1,29 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Webserv.hpp                                        :+:      :+:    :+:   */
+/*   IConfigs.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mochida <mochida@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/14 23:08:02 by mochida           #+#    #+#             */
-/*   Updated: 2024/02/14 23:23:39 by mochida          ###   ########.fr       */
+/*   Created: 2024/02/14 23:31:59 by mochida           #+#    #+#             */
+/*   Updated: 2024/02/15 18:01:29 by mochida          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-#ifndef WEBSERV_HPP
-# define WEBSERV_HPP
-
+#include <map>
 #include <string>
 
-class Webserv{
+class IConfigs{
 public:
-	Webserv(void);
-	~Webserv(void);
-	Webserv(int argc, char *argv[]);
-	int init(int argc, char *argv[]);
+	// OCF default constructor
+	IConfigs(void);
+	// OCF default destructor
+	~IConfigs(void);
+	// OCF copy constructor
+	IConfigs(const IConfigs & instance);
+	// OCF assign operator overload
+	IConfigs & operator=(const IConfigs & instance);
+	// argument constructor
+	IConfigs(int argc, char *argv[]);
+
+	// returns a map of configurations
+	virtual std::map<std::string, std::string> getConfigs(std::string pathToFile) = 0;
+	
 protected:
 private:
 };
-
-#endif //WEBSERV_HPP

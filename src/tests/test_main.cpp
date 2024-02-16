@@ -6,7 +6,7 @@
 /*   By: mochida <mochida@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 21:29:12 by mochida           #+#    #+#             */
-/*   Updated: 2024/02/14 22:48:43 by mochida          ###   ########.fr       */
+/*   Updated: 2024/02/14 23:19:54 by mochida          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ TEST(GtestTest, SimpleAssertion) {
     EXPECT_EQ(a, 5);
 }
 
-// int main(int argc, char **argv) {
-//     ::testing::InitGoogleTest(&argc, argv);
-//     return RUN_ALL_TESTS();
-// }
+TEST(WebservClass, defaultConstructor){
+	Webserv instance;
+	EXPECT_EQ(1, 1);
+}

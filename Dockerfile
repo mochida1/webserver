@@ -17,4 +17,6 @@ EXPOSE	80:80
 
 RUN		mkdir /webserv
 
-CMD ["bash"]
+WORKDIR /webserv
+
+CMD ["/bin/bash"]

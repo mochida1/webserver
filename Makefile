@@ -6,7 +6,7 @@
 #    By: mochida <mochida@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/05 13:42:57 by hmochida          #+#    #+#              #
-#    Updated: 2024/02/14 22:51:17 by mochida          ###   ########.fr        #
+#    Updated: 2024/02/16 19:46:21 by mochida          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -78,15 +78,17 @@ all: $(NAME)
 
 test: $(NAME_TEST)
 	@echo "--------- Running tests ----------"
-	@./gtest_webserv
+	@./tools/runtests.sh
 
 docker:
+	sudo ./tools/add_nameservers.sh
 	sudo docker volume create --name webserv_vol --opt type=none --opt device=$(PWD) --opt o=bind
 	sudo docker-compose up -d
 	sudo docker exec -it webserv bash
 
 docker_clean:
 	sudo docker-compose down
+	sudo docker volume rm webserv_vol
 	sudo docker system prune -af
 
 pwd:
@@ -108,8 +110,17 @@ fclean: clean
 re: fclean all
 
 # from here on shit ain't mandatory or bonus
-run: all
-	$(VAL)
+run: 
+	@sudo ./tools/add_nameservers.sh
+	@if [ $$(docker ps -q -f name=webserv) ]; then \
+        sudo docker-compose up -d; \
+    elif [ $$(docker images -q webserv) ]; then \
+        sudo docker-compose up -d; \
+    else \
+		sudo docker volume create --name webserv_vol --opt type=none --opt device=$(PWD) --opt o=bind && \
+		sudo docker-compose up -d; \
+    fi
+	sudo docker exec -it webserv bash
 
 go: all
 	$(GO)
@@ -122,4 +133,4 @@ git: fclean
 	git commit -m "make git"
 	git push
 
-PHONY:	all clean fclean re run
+PHONY:	all clean fclean re run docker docker_clean

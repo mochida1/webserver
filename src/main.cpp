@@ -6,7 +6,7 @@
 /*   By: mochida <mochida@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 21:13:55 by mochida           #+#    #+#             */
-/*   Updated: 2024/02/14 22:44:11 by mochida          ###   ########.fr       */
+/*   Updated: 2024/02/14 23:16:59 by mochida          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,6 @@
 int main (int argc, char *argv[]){
 	(void)(argc);
 	(void)(argv);
-	std::cout << "main: hello world!" << std::endl;
+	Webserv test;
+	return 0;
 }
