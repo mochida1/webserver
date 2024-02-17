@@ -16,6 +16,7 @@
 class ArgumentValidator {
 public:
 	static void	validateArguments(int argc, char *argv[]);
+	static bool checkEnvs(char **envp);
 
 	// Excpetion-----------
 	class ArgumentValidatorException : public std::exception {

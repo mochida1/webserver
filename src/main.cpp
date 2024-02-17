@@ -3,14 +3,30 @@
 #include "main.hpp"
 #include <iostream>
 
+int init(int argc, char *argv[], char **envp){
+	try{
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		std::cerr << "ERROR: " << e.what() << std::endl;
+		return 1;
+	}
+	try{
+		ArgumentValidator::checkEnvs(envp);
+	}
+	catch(const std::exception& e){
+		std::cerr << "ERROR: " << e.what() << std::endl;
+		return 2;
+	}
+	return 0;
+}
+
 int main (int argc, char *argv[], char **envp){
-	std::cout << "ENVP ----------" << std::endl;
-	for (int i = 0; envp[i] != NULL; i++){
-		std::cout << envp[i] << std::endl;
+	int rc = 1;
+	rc = init(argc, argv, envp);
+	if (rc){
+		return rc;
 	}
 
-	(void)(argc);
-	(void)(argv);
-	
 	return 0;
 }

@@ -70,7 +70,7 @@ static bool checkArgumentsForDoubleConf(char *argv[]){
 	return true;
 }
 
-static int fileExists(char *argv[]){
+static int accessFileStatus(char *argv[]){
 	std::set<std::string> arguments;
 	for (int i = 1; argv[i] != NULL; i++){
 		std::string arg(argv[i]);
@@ -93,6 +93,14 @@ static int fileExists(char *argv[]){
 	return 0;
 }
 
+bool ArgumentValidator::checkEnvs(char **envp){
+	int i;
+	for (i = 0; envp[i] != NULL; i++);
+	if (!i)
+		throw ArgumentValidator::ArgumentValidatorException(EARG_NOENVS);
+	return true;
+}
+
 void ArgumentValidator::validateArguments(int argc, char *argv[]) {
 	if (!checkArgcMinConstraint(argc)) {
 		throw ArgumentValidator::ArgumentValidatorException(EARG_NOARGS);
@@ -107,7 +115,7 @@ void ArgumentValidator::validateArguments(int argc, char *argv[]) {
 		throw ArgumentValidator::ArgumentValidatorException(EARG_DOUBLECONF);
 	}
 	int rc = -1;
-	rc = fileExists(argv);
+	rc = accessFileStatus(argv);
 	if (rc)
 		throw ArgumentValidator::ArgumentValidatorException(std::strerror(errno));
 

@@ -8,5 +8,6 @@
 #define EARG_TOOMANYARGS "Too many arguments"
 #define EARG_DOUBLECONF "Y u no try moar confs?"
 #define EARG_FILENOTEXISTS "File does not exists"
+#define EARG_NOENVS "Environment variables are missing"
 
 #endif //ERRORS_WEBSERV_HPP
