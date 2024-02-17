@@ -14,7 +14,7 @@ TEST_LDFLAGS = -lgtest -lgtest_main
 
 # Lists sources. Manually because of norm...
 MAIN = main.cpp
-SRC = Webserv.cpp Server.cpp ConfigsLoader.cpp
+SRC = Webserv.cpp Server.cpp ConfigsLoader.cpp ArgumentValidator.cpp
 TEST_MAIN = test_main.cpp
 
 # Names sources
@@ -66,10 +66,12 @@ $(TEST_BUILDDIR)/%.o: %.cpp
 
 all: $(NAME)
 
-test: $(NAME_TEST) $(NAME)
-	@clear
+test: cls $(NAME_TEST) $(NAME)
 	@echo "--------- Running tests ----------"
 	@./tools/runtests.sh
+
+cls:
+	@clear
 
 docker:
 	sudo ./tools/add_nameservers.sh

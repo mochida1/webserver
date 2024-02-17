@@ -9,8 +9,6 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
-#include "Errors_webserv.hpp"
-#include "Constraints_webserv.hpp"
 
 class ConfigsLoader {
 public:
@@ -47,7 +45,6 @@ protected:
 private:
 	std::map<std::string, std::string> _getRequiredConfigs();
 	std::vector<std::string> _getConfigsFromFile(std::string pathToFile);
-	void	_validateArguments(int argc, char *argv[]);
 	std::string _pathToFile;
 };
 
