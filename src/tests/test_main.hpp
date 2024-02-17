@@ -11,5 +11,8 @@
 #include "Errors_webserv.hpp"
 #include "Constraints_webserv.hpp"
 #include <cstring>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 #endif // TEST_MAIN_HPP

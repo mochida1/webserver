@@ -8,9 +8,12 @@ objs/
 test_objs/
 objs/*
 test_objs/*
+tests_random/
+tests_random/*
 webserv
 gtest_webserv
 vgcore*
+*.o
 
 *.rsuser
 *.suo

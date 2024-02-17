@@ -3,8 +3,8 @@
 #include "test_main.hpp"
 
 TEST(GtestTest, SimpleAssertion) {
-    int a = 5;
-    EXPECT_EQ(a, 5);
+	int a = 5;
+	EXPECT_EQ(a, 5);
 }
 
 TEST(ArgumentValidator, noFile_EARG_NOARGS){
@@ -152,6 +152,27 @@ TEST(ArgumentValidator, wrongArgumentFlags4){
 	EXPECT_EQ(hasThrownException, true);
 }
 
+TEST(ArgumentValidator, wrongArgumentFlags5){
+	int argc = 4;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/mock.conf");
+	char *arg2 = (char *)("--logLevel=4");
+	char *arg3 = (char *)("-d");
+	char *argv[argc + 1] = {arg0, arg1, arg2, arg3, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		const char *expected = EARG_WRONGARGS;
+		
+		EXPECT_EQ(std::strcmp(expected, e.what()), 0);
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, true);
+}
+
 TEST(ArgumentValidator, rightArgumentFlags){
 	int argc = 3;
 	char *arg0 = (char *)("./gtest_websev");
@@ -191,6 +212,135 @@ TEST(ArgumentValidator, rightArgumentFlags2){
 		hasThrownException = true;
 	}
 	EXPECT_EQ(hasThrownException, false);
+}
+
+TEST(ArgumentValidator, rightArgumentFlags3){
+	int argc = 4;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/mock.conf");
+	char *arg2 = (char *)("-d");
+	char *arg3 = (char *)("--logLevel=3");
+	char *argv[argc + 1] = {arg0, arg1, arg2, arg3, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		const char *expected = "NOT EXPECTED!!!";
+		
+		EXPECT_EQ(std::strcmp(expected, e.what()), 0);
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+}
+
+TEST(ArgumentValidator, rightArgumentFlags4){
+	int argc = 4;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/mock.conf");
+	char *arg2 = (char *)("--logLevel=3");
+	char *arg3 = (char *)("-d");
+	char *argv[argc + 1] = {arg0, arg1, arg2, arg3, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		const char *expected = "NOT EXPECTED!!!";
+		
+		EXPECT_EQ(std::strcmp(expected, e.what()), 0);
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+}
+
+TEST(ArgumentValidator, rightArgumentFlags5){
+	int argc = 4;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("--logLevel=3");
+	char *arg2 = (char *)("conf/mock.conf");
+	char *arg3 = (char *)("-d");
+	char *argv[argc + 1] = {arg0, arg1, arg2, arg3, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		const char *expected = "NOT EXPECTED!!!";
+		
+		EXPECT_EQ(std::strcmp(expected, e.what()), 0);
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+}
+
+TEST(ArgumentValidator, doubleConf){
+	int argc = 4;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("--logLevel=3");
+	char *arg2 = (char *)("conf/mock.conf");
+	char *arg3 = (char *)("conf/default.conf");
+	char *argv[argc + 1] = {arg0, arg1, arg2, arg3, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		const char *expected = EARG_DOUBLECONF;
+		
+		EXPECT_EQ(std::strcmp(expected, e.what()), 0);
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, true);
+}
+
+TEST(ArgumentValidator, onlyFileNotExists){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/lolollolmock.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, true);
+}
+
+TEST(ArgumentValidator, onlyFileNoPerm){
+	uid_t uid = getuid(); // Get real user ID of the current process
+	struct passwd* pwd = getpwuid(uid); // Retrieve user information
+
+	if (pwd != nullptr) {
+		std::string userID(pwd->pw_name);
+		if (userID.compare("root") == 0) //checks wheter the user is root. If so, will always be able to access the W/R locked file.
+			return;
+	}
+	else {
+		std::cerr << "Failed to get user information." << std::endl;
+		EXPECT_STREQ("THIS IS", "fucked up"); // fails gloriously
+	}
+
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/000perms.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, true);
 }
 
 TEST(ArgumentValidator, onlyFile){

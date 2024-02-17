@@ -1,6 +1,5 @@
 
 #include "ArgumentValidator.hpp"
-#include <iostream>
 
 static bool checkArgcMinConstraint(int argc) {
 	if (argc < CONSTRAINT_ARGC_MIN_VALUE)
@@ -51,6 +50,49 @@ static bool checkArgumentsFormat(int argc, char *argv[]) {
 	return true;
 }
 
+static bool checkArgumentsForDoubleConf(char *argv[]){
+	std::set<std::string> arguments;
+	for (int i = 1; argv[i] != NULL; i++){
+		std::string arg(argv[i]);
+		if (arguments.insert(arg).second == false){
+			throw ArgumentValidator::ArgumentValidatorException("Oh shit. Something really fucked up happened!");
+		}
+	}
+
+	bool foundDotConf = false;
+	for (std::set<std::string>::iterator it =  arguments.begin(); it != arguments.end(); it++ ) {
+		if (it->find(CONSTRAINT_CONF_EXTENSION) != std::string::npos) {
+			if (foundDotConf == true)
+				return false;
+			foundDotConf = true;
+		}
+	}
+	return true;
+}
+
+static int fileExists(char *argv[]){
+	std::set<std::string> arguments;
+	for (int i = 1; argv[i] != NULL; i++){
+		std::string arg(argv[i]);
+		if (arguments.insert(arg).second == false){
+			throw ArgumentValidator::ArgumentValidatorException("Oh shit. Something really fucked up happened!");
+		}
+	}
+
+	std::string pathToFile;
+	for (std::set<std::string>::iterator it =  arguments.begin(); it != arguments.end(); it++ ) {
+		if (it->find(CONSTRAINT_CONF_EXTENSION) != std::string::npos) {
+			pathToFile = *it;
+			break;
+		}
+	}
+
+	if ( access(pathToFile.c_str(), R_OK | F_OK) ){
+		return errno;
+	}
+	return 0;
+}
+
 void ArgumentValidator::validateArguments(int argc, char *argv[]) {
 	if (!checkArgcMinConstraint(argc)) {
 		throw ArgumentValidator::ArgumentValidatorException(EARG_NOARGS);
@@ -61,8 +103,13 @@ void ArgumentValidator::validateArguments(int argc, char *argv[]) {
 	else if(!checkArgumentsFormat(argc, argv)) {
 		throw ArgumentValidator::ArgumentValidatorException(EARG_WRONGARGS);
 	}
-	// else if (!fileExists(argv[1])) {
+	else if(!checkArgumentsForDoubleConf(argv)) {
+		throw ArgumentValidator::ArgumentValidatorException(EARG_DOUBLECONF);
+	}
+	int rc = -1;
+	rc = fileExists(argv);
+	if (rc)
+		throw ArgumentValidator::ArgumentValidatorException(std::strerror(errno));
 
-	// }
 	return ;
 }

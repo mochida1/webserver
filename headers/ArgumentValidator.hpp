@@ -4,6 +4,10 @@
 #include <stdexcept>
 #include <set>
 #include <vector>
+#include <filesystem>
+#include <unistd.h>
+#include <cerrno>
+#include <cstring>
 
 //ideally those should be inside inherited class to help with dependency inversion
 #include "Errors_webserv.hpp"
