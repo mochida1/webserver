@@ -12,6 +12,8 @@ tests_random/
 tests_random/*
 webserv
 gtest_webserv
+./webserv
+./gtest_webserv
 vgcore*
 *.o
 
