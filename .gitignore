@@ -4,10 +4,12 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # User-specific files
-./objs/
-./test_objs/
-./webserv
-./gtest_webserv
+objs/
+test_objs/
+objs/*
+test_objs/*
+webserv
+gtest_webserv
 vgcore*
 
 *.rsuser
