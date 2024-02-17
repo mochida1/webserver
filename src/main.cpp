@@ -1,21 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mochida <mochida@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/14 21:13:55 by mochida           #+#    #+#             */
-/*   Updated: 2024/02/14 23:16:59 by mochida          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "main.hpp"
+#include <iostream>
 
+int main (int argc, char *argv[], char **envp){
+	std::cout << "ENVP ----------" << std::endl;
+	for (int i = 0; envp[i] != NULL; i++){
+		std::cout << envp[i] << std::endl;
+	}
 
-int main (int argc, char *argv[]){
 	(void)(argc);
 	(void)(argv);
-	Webserv test;
+	
 	return 0;
 }

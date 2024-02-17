@@ -1,14 +1,4 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: mochida <mochida@student.42.fr>            +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/03/05 13:42:57 by hmochida          #+#    #+#              #
-#    Updated: 2024/02/16 19:46:21 by mochida          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+
 
 NAME = webserv
 NAME_TEST = gtest_webserv
@@ -24,7 +14,7 @@ TEST_LDFLAGS = -lgtest -lgtest_main
 
 # Lists sources. Manually because of norm...
 MAIN = main.cpp
-SRC = Webserv.cpp Server.cpp Configs.cpp
+SRC = Webserv.cpp Server.cpp ConfigsLoader.cpp
 TEST_MAIN = test_main.cpp
 
 # Names sources
@@ -76,7 +66,8 @@ $(TEST_BUILDDIR)/%.o: %.cpp
 
 all: $(NAME)
 
-test: $(NAME_TEST)
+test: $(NAME_TEST) $(NAME)
+	@clear
 	@echo "--------- Running tests ----------"
 	@./tools/runtests.sh
 
