@@ -21,6 +21,7 @@ if url /kapouet is rooted to /tmp/www, url /kapouet/pouic/toto/pouet is
 ◦ Make it work with POST and GET methods.
 ◦ Make the route able to accept uploaded files and configure where they should
 be saved.
+
 ∗ Do you wonder what a CGI is?
 ∗ Because you won’t call the CGI directly, use the full path as PATH_INFO.
 ∗ Just remember that, for chunked request, your server needs to unchunk

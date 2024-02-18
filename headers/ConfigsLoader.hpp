@@ -9,11 +9,11 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
+#include <fstream>
+#include "Constraints_webserv.hpp"
 
 class ConfigsLoader {
 public:
-	// OCF default constructor
-	ConfigsLoader(void);
 	// OCF default destructor
 	~ConfigsLoader(void);
 	// OCF copy constructor
@@ -23,9 +23,14 @@ public:
 	// argument constructor
 	ConfigsLoader(int argc, char *argv[], char **envp);
 
+
+	const std::string getPathToFile(void) const ;
+	const std::vector<std::string> getConfigsVector(void) const;
 	// returns a map of configurations
+	/* 
+	deve ser const std::map<std::deque<std::pair<std::string, std::vector<std::string>>> fun() ou coisa do gênero. e não...
 	const std::map<std::string, std::string> getConfigs(void);
-	
+	 */
 	// Excpetion-----------
 	class ConfigsLoaderException : public std::exception {
 	public:
@@ -44,8 +49,19 @@ public:
 protected:
 private:
 	std::map<std::string, std::string> _getRequiredConfigs();
-	std::vector<std::string> _getConfigsFromFile(std::string pathToFile);
+	std::vector<std::string> _readConfigsFromFile(void);
+	std::string _getPathToFileFromArgv(char *argv[]);
+	std::map<std::string, std::string> _loadEnvsToMap(char **envp);
+	void _expandEnvs();
+
+	int _argc;
 	std::string _pathToFile;
+	std::map<std::string, std::string> _envs;
+	std::vector<std::string> _loadedConfigs;
+
+	
+	// OCF default constructor
+	ConfigsLoader(void);
 };
 
 #endif // CONFIGS_HPP

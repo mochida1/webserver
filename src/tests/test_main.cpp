@@ -7,6 +7,13 @@ TEST(GtestTest, SimpleAssertion) {
 	EXPECT_EQ(a, 5);
 }
 
+
+/*
+	-------------------------------------------------------------------
+	*******************  ArgumentsValidator  **************************
+	-------------------------------------------------------------------
+*/
+
 TEST(ArgumentValidator, noFile_EARG_NOARGS){
 	int argc = 1;
 
@@ -298,6 +305,27 @@ TEST(ArgumentValidator, doubleConf){
 	EXPECT_EQ(hasThrownException, true);
 }
 
+TEST(ArgumentValidator, doubleFlag){
+	int argc = 4;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("--logLevel=3");
+	char *arg2 = (char *)("conf/mock.conf");
+	char *arg3 = (char *)("--logLevel=3");
+	char *argv[argc + 1] = {arg0, arg1, arg2, arg3, NULL};
+	bool hasThrownException = false;
+
+	try {
+		ArgumentValidator::validateArguments(argc, argv);
+	}
+	catch(const std::exception& e){
+		const char *expected = EARG_WRONGARGS;
+		
+		EXPECT_EQ(std::strcmp(expected, e.what()), 0);
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, true);
+}
+
 TEST(ArgumentValidator, onlyFileNotExists){
 	int argc = 2;
 	char *arg0 = (char *)("./gtest_websev");
@@ -359,8 +387,40 @@ TEST(ArgumentValidator, onlyFile){
 	EXPECT_EQ(hasThrownException, false);
 }
 
+/*
+	-------------------------------------------------------------------
+	**********************  ConfigsLoader  ****************************
+	-------------------------------------------------------------------
+*/
 
 // Makes sure ConfigsLoader can be constructed
-TEST(ConfigsLoader, defaultConstructor){
-	ConfigsLoader instance;
+TEST(ConfigsLoader, Constructor01){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/ConfigsLoader.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try {
+		ConfigsLoader tempInstance(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	ConfigsLoader instance(argc, argv, environ);
+	EXPECT_EQ(hasThrownException, false);
+	EXPECT_STREQ(instance.getPathToFile().c_str(), arg1);
+
+	const std::vector<std::string> configsVector = instance.getConfigsVector();
+
+	EXPECT_STREQ(configsVector[0].c_str(), "first line");
+	EXPECT_STREQ(configsVector[1].c_str(), "second line");
+	EXPECT_STREQ(configsVector[2].c_str(), "third line");
 }
+
+
+/*
+	-------------------------------------------------------------------
+	***********************  DEATHTESTS  *****************************
+	-------------------------------------------------------------------
+*/
