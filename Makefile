@@ -93,12 +93,12 @@ pwd:
 clean:
 	@rm -rf $(BUILDDIR)
 	@rm -rf $(TEST_BUILDDIR)
+	@rm -f core
 	@rm -f vgcore*
 
 fclean: clean
 	@rm -f $(NAME)
 	@rm -f $(NAME_TEST)
-	@rm -f vgcore*
 
 re: fclean all
 

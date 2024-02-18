@@ -25,6 +25,7 @@ ConfigsLoader::ConfigsLoader(int argc, char *argv[], char **envp){
 		this->_pathToFile = this->_getPathToFileFromArgv(argv);
 		this->_envs = this->_loadEnvsToMap(envp);
 		this->_loadedConfigs = this->_readConfigsFromFile();
+		this->_expandedConfigs = this->_expandEnvs();
 	}
 	catch(const std::exception& e){
 		return; //TODO - adicionar algo para fazer na exception!
@@ -48,6 +49,14 @@ const std::string ConfigsLoader::getPathToFile(void) const{
 
 const std::vector<std::string> ConfigsLoader::getConfigsVector(void) const {
 	return this->_loadedConfigs;
+}
+
+const std::map<std::string, std::string> ConfigsLoader::getEnvsMap(void) const {
+	return this->_envs;
+}
+
+const std::vector<std::string> ConfigsLoader::getExpandedConfigs(void) const {
+	return this->_expandedConfigs;
 }
 
 static const std::pair<std::string, std::string> getPairFromEnv(char *env) {
@@ -95,3 +104,40 @@ std::vector<std::string> ConfigsLoader::_readConfigsFromFile(void){
 	return lines;
 }
 
+#include <iostream>
+
+void ConfigsLoader::_expand_environment_variables(std::string &line){
+	size_t envStartPos = line.find_first_of('$');
+	if (envStartPos == line.size() - 1)
+		throw ConfigsLoader::ConfigsLoaderException("Wrong formating, found $ at end of line.");
+	else if(envStartPos == std::string::npos)
+		return ;
+	size_t envEndPos = line.find_first_of(' ', envStartPos);
+	std::string toFind = line.substr(envStartPos, envEndPos);
+	if (toFind.at(1) != '{')
+		toFind = toFind.substr(1);
+	else
+		toFind = toFind.substr(2, toFind.find_first_of('}') - 2);
+	std::string value = this->_envs.find(toFind)->second;
+	line.replace(envStartPos, envEndPos, value);
+	this->_expand_environment_variables(line);
+}
+
+std::vector<std::string> ConfigsLoader::_expandEnvs(void){
+	std::vector<std::string> ret;
+	int lineCount = 0;
+	for (std::vector<std::string>::iterator it = this->_loadedConfigs.begin(); it != this->_loadedConfigs.end(); it++){
+		ret.push_back(*it);
+		try
+		{
+			this->_expand_environment_variables(ret.back());
+			
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << "Configuration File " << this->_pathToFile <<" at line: "<< e.what() << '\n';
+		}
+		lineCount++;	
+	}
+	return ret;
+}

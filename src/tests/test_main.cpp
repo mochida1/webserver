@@ -401,7 +401,7 @@ TEST(ConfigsLoader, Constructor01){
 	char *argv[argc + 1] = {arg0, arg1, NULL};
 	extern char **environ;
 	bool hasThrownException = false;
-	try {
+	try { // tests if default constructor is working as it should.
 		ConfigsLoader tempInstance(argc, argv, environ);
 	}
 	catch(const std::exception& e){
@@ -411,11 +411,35 @@ TEST(ConfigsLoader, Constructor01){
 	EXPECT_EQ(hasThrownException, false);
 	EXPECT_STREQ(instance.getPathToFile().c_str(), arg1);
 
-	const std::vector<std::string> configsVector = instance.getConfigsVector();
+	{ // tests reading from file
+		const std::vector<std::string> configsVector = instance.getConfigsVector();
+		int i = 0;
+		EXPECT_STREQ(configsVector[i++].c_str(), "first line");
+		EXPECT_STREQ(configsVector[i++].c_str(), "second line");
+		EXPECT_STREQ(configsVector[i++].c_str(), "third line");
+		EXPECT_STREQ(configsVector[i++].c_str(), "$TEST_ENV01 ${TEST_ENV02}");
+		EXPECT_STREQ(configsVector[i++].c_str(), "${TEST_ENV03} $TEST_ENV04");
+		EXPECT_STREQ(configsVector[i++].c_str(), "# comment");
+		EXPECT_STREQ(configsVector[i++].c_str(), "last line # comment to remove");
+	}
 
-	EXPECT_STREQ(configsVector[0].c_str(), "first line");
-	EXPECT_STREQ(configsVector[1].c_str(), "second line");
-	EXPECT_STREQ(configsVector[2].c_str(), "third line");
+	{ // tests reading from envs
+		const std::map<std::string, std::string> envs = instance.getEnvsMap();
+		EXPECT_STREQ(envs.find("TEST_ENV01")->second.c_str(), "env01");
+		EXPECT_STREQ(envs.find("TEST_ENV02")->second.c_str(), "env02");
+	}
+
+	{
+		std::vector<std::string> expandedConfigs = instance.getExpandedConfigs();
+		int i = 0;
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "first line");
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "second line");
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "third line");
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "env01 env02");
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "env03 env04");
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "# comment");
+		EXPECT_STREQ(expandedConfigs[i++].c_str(), "last line # comment to remove");
+	}
 }
 
 

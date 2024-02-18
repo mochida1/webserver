@@ -11,6 +11,9 @@
 #include <stdexcept>
 #include <fstream>
 #include "Constraints_webserv.hpp"
+#include "DTO_Configs.hpp"
+
+//WARNING: this class has some major memory overhead. 
 
 class ConfigsLoader {
 public:
@@ -23,14 +26,12 @@ public:
 	// argument constructor
 	ConfigsLoader(int argc, char *argv[], char **envp);
 
-
-	const std::string getPathToFile(void) const ;
-	const std::vector<std::string> getConfigsVector(void) const;
 	// returns a map of configurations
 	/* 
 	deve ser const std::map<std::deque<std::pair<std::string, std::vector<std::string>>> fun() ou coisa do gênero. e não...
-	const std::map<std::string, std::string> getConfigs(void);
 	 */
+	DTO_Configs getConfigs(void) const;
+
 	// Excpetion-----------
 	class ConfigsLoaderException : public std::exception {
 	public:
@@ -45,6 +46,13 @@ public:
 	private:
 		std::string errorMessage;
 	};
+	
+
+	// those are intended for testing. Do no use.
+	const std::string getPathToFile(void) const ;
+	const std::vector<std::string> getConfigsVector(void) const;
+	const std::map<std::string, std::string> getEnvsMap(void) const;
+	const std::vector<std::string> getExpandedConfigs(void) const;
 	//---------------------
 protected:
 private:
@@ -52,12 +60,14 @@ private:
 	std::vector<std::string> _readConfigsFromFile(void);
 	std::string _getPathToFileFromArgv(char *argv[]);
 	std::map<std::string, std::string> _loadEnvsToMap(char **envp);
-	void _expandEnvs();
+	std::vector<std::string> _expandEnvs(void);
+	void _expand_environment_variables(std::string &line);
 
 	int _argc;
 	std::string _pathToFile;
 	std::map<std::string, std::string> _envs;
 	std::vector<std::string> _loadedConfigs;
+	std::vector<std::string> _expandedConfigs;
 
 	
 	// OCF default constructor
