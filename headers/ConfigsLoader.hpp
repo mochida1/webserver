@@ -30,7 +30,7 @@ public:
 	/* 
 	deve ser const std::map<std::deque<std::pair<std::string, std::vector<std::string>>> fun() ou coisa do gênero. e não...
 	 */
-	DTO_Configs getConfigs(void) const;
+	const DTO_Configs getConfigs(void) const;
 
 	// Excpetion-----------
 	class ConfigsLoaderException : public std::exception {
@@ -65,6 +65,7 @@ private:
 	void _expand_environment_variables(std::string &line);
 	std::vector<std::string> _removeComments(void);
 	std::vector<std::string> _trimAndRemoveEmpty(void);
+	const DTO_Configs _generateDTO(void) const;
 
 	int _argc;
 	std::string _pathToFile;

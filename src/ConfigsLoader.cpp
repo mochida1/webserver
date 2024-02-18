@@ -27,6 +27,7 @@ ConfigsLoader::ConfigsLoader(int argc, char *argv[], char **envp){
 	this->_expandedConfigs = this->_expandEnvs();
 	this->_noCommentsConfigs = this->_removeComments();
 	this->_noCommentsConfigs = this->_trimAndRemoveEmpty();
+	this->_DTO_Configs = this->_generateDTO();
 }
 
 std::string ConfigsLoader::_getPathToFileFromArgv(char *argv[]){
@@ -119,14 +120,17 @@ void ConfigsLoader::_expand_environment_variables(std::string &line){
 	size_t envStartPos = line.find_first_of('$');
 	if(envStartPos == std::string::npos)
 		return ;
-	size_t envEndPos = line.find_first_of(" \t", envStartPos);
+	size_t envEndPos = line.find_first_of(" \r\t;", envStartPos);
 	std::string toFind = line.substr(envStartPos, envEndPos);
 	if (toFind.at(1) != '{' )
-		toFind = toFind.substr(1);
+		toFind = toFind.substr(1, toFind.find_first_of(" \t\r;") - 1);
 	else
-		toFind = toFind.substr(2, toFind.find_first_of('}') - 2);
+		toFind = toFind.substr(2, toFind.find('}') - 2);
+
 	std::string value = this->_envs.find(toFind)->second;
-	line.replace(envStartPos, envEndPos, value);
+	if (value.empty())
+		throw ConfigsLoader::ConfigsLoaderException("Missing environment variable: ["+ toFind +"]" );
+	line.replace(envStartPos, envEndPos - envStartPos, value);
 	this->_expand_environment_variables(line);
 }
 
@@ -165,4 +169,13 @@ std::vector<std::string> ConfigsLoader::_trimAndRemoveEmpty(void){
 			ret.push_back(*line);
 	}
 	return ret;
+}
+
+const DTO_Configs ConfigsLoader::getConfigs(void) const{
+	return this->_DTO_Configs;
+}
+
+const DTO_Configs ConfigsLoader::_generateDTO(void) const{
+	DTO_Configs ctx;
+	return ctx;
 }

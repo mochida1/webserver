@@ -486,8 +486,137 @@ TEST(ConfigsLoader, Constructor03){
 	}
 }
 
+TEST(ConfigsLoader, Constructor04){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/template.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try { // tests if default constructor is working as it should. Should throw when parsing config file
+		ConfigsLoader tempInstance(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+
+	ConfigsLoader instance(argc, argv, environ);
+	{
+		std::vector<std::string> noComments = instance.getNoCommentsConfigs();
+		int i = 0;
+		EXPECT_STREQ(noComments[i++].c_str(), "events {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "http {");
+		EXPECT_STREQ(noComments[i++].c_str(), "server {");
+		EXPECT_STREQ(noComments[i++].c_str(), "location /match/criteria {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "location /other/criteria {");
+		EXPECT_STREQ(noComments[i++].c_str(), "location nested_match {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "location other_nested {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "server {");
+		EXPECT_STREQ(noComments[i++].c_str(), "location /match/criteria {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "location /other/criteria {");
+		EXPECT_STREQ(noComments[i++].c_str(), "location nested_match {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "location other_nested {");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "upstream upstream_name {");
+		EXPECT_STREQ(noComments[i++].c_str(), "server proxy_server1;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server proxy_server2;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+	}
+}
+
+TEST(ConfigsLoader, Constructor05){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/mock.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try { // tests if default constructor is working as it should. Should throw when parsing config file
+		ConfigsLoader tempInstance(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+
+	ConfigsLoader instance(argc, argv, environ);
+	{
+		std::vector<std::string> noComments = instance.getNoCommentsConfigs();
+		int i = 0;
+		EXPECT_STREQ(noComments[i++].c_str(), "user       www www;");
+		EXPECT_STREQ(noComments[i++].c_str(), "worker_processes  5;");
+		EXPECT_STREQ(noComments[i++].c_str(), "error_log  logs/error.log;");
+		EXPECT_STREQ(noComments[i++].c_str(), "pid        logs/nginx.pid;");
+		EXPECT_STREQ(noComments[i++].c_str(), "worker_rlimit_nofile 8192;");
+		EXPECT_STREQ(noComments[i++].c_str(), "events {");
+		EXPECT_STREQ(noComments[i++].c_str(), "worker_connections  4096;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "http {");
+		EXPECT_STREQ(noComments[i++].c_str(), "include    conf/mime.types;");
+		EXPECT_STREQ(noComments[i++].c_str(), "include    /etc/nginx/proxy.conf;");
+		EXPECT_STREQ(noComments[i++].c_str(), "include    /etc/nginx/fastcgi.conf;");
+		EXPECT_STREQ(noComments[i++].c_str(), "index    index.html index.htm index.php;");
+		EXPECT_STREQ(noComments[i++].c_str(), "default_type application/octet-stream;");
+		EXPECT_STREQ(noComments[i++].c_str(), "log_format   main env01 - env02 env03  env04 env05 env06 env07 env08 env09;");
+		EXPECT_STREQ(noComments[i++].c_str(), "access_log   logs/access.log  main;");
+		EXPECT_STREQ(noComments[i++].c_str(), "sendfile     on;");
+		EXPECT_STREQ(noComments[i++].c_str(), "tcp_nopush   on;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server_names_hash_bucket_size 128;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server {");
+		EXPECT_STREQ(noComments[i++].c_str(), "listen       80;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server_name  domain1.com www.domain1.com;");
+		EXPECT_STREQ(noComments[i++].c_str(), "access_log   logs/domain1.access.log  main;");
+		EXPECT_STREQ(noComments[i++].c_str(), "root         html;");
+		EXPECT_STREQ(noComments[i++].c_str(), "location ~ \\.php {");
+		EXPECT_STREQ(noComments[i++].c_str(), "fastcgi_pass   127.0.0.1:1025;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "server {");
+		EXPECT_STREQ(noComments[i++].c_str(), "listen       80;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server_name  domain2.com www.domain2.com;");
+		EXPECT_STREQ(noComments[i++].c_str(), "access_log   logs/domain2.access.log  main;");
+		EXPECT_STREQ(noComments[i++].c_str(), "location ~ ^/(images|javascript|js|css|flash|media|static)/  {");
+		EXPECT_STREQ(noComments[i++].c_str(), "root    /var/www/virtual/big.server.com/htdocs;");
+		EXPECT_STREQ(noComments[i++].c_str(), "expires 30d;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "location / {");
+		EXPECT_STREQ(noComments[i++].c_str(), "proxy_pass      http://127.0.0.1:8080;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "upstream big_server_com {");
+		EXPECT_STREQ(noComments[i++].c_str(), "server 127.0.0.3:8000 weight=5;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server 127.0.0.3:8001 weight=5;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server 192.168.0.1:8000;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server 192.168.0.1:8001;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "server {");
+		EXPECT_STREQ(noComments[i++].c_str(), "listen          80;");
+		EXPECT_STREQ(noComments[i++].c_str(), "server_name     big.server.com;");
+		EXPECT_STREQ(noComments[i++].c_str(), "access_log      logs/big.server.access.log main;");
+		EXPECT_STREQ(noComments[i++].c_str(), "location / {");
+		EXPECT_STREQ(noComments[i++].c_str(), "proxy_pass      http://big_server_com;");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		EXPECT_STREQ(noComments[i++].c_str(), "}");
+		
+	}
+}
+
 /*
 	-------------------------------------------------------------------
 	***********************  DEATHTESTS  *****************************
 	-------------------------------------------------------------------
 */
+
