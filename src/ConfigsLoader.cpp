@@ -21,15 +21,12 @@ ConfigsLoader & ConfigsLoader::operator=(const ConfigsLoader & instance){
 
 ConfigsLoader::ConfigsLoader(int argc, char *argv[], char **envp){
 	this->_argc = argc;
-	try{ 
-		this->_pathToFile = this->_getPathToFileFromArgv(argv);
-		this->_envs = this->_loadEnvsToMap(envp);
-		this->_loadedConfigs = this->_readConfigsFromFile();
-		this->_expandedConfigs = this->_expandEnvs();
-	}
-	catch(const std::exception& e){
-		return; //TODO - adicionar algo para fazer na exception!
-	}
+	this->_pathToFile = this->_getPathToFileFromArgv(argv);
+	this->_envs = this->_loadEnvsToMap(envp);
+	this->_loadedConfigs = this->_readConfigsFromFile();
+	this->_expandedConfigs = this->_expandEnvs();
+	this->_noCommentsConfigs = this->_removeComments();
+	this->_noCommentsConfigs = this->_trimAndRemoveEmpty();
 }
 
 std::string ConfigsLoader::_getPathToFileFromArgv(char *argv[]){
@@ -104,17 +101,27 @@ std::vector<std::string> ConfigsLoader::_readConfigsFromFile(void){
 	return lines;
 }
 
-#include <iostream>
+static void _trim(std::string& str) {
+	size_t first = str.find_first_not_of(" \t\n\r");
+	size_t last = str.find_last_not_of(" \t\n\r");
+	
+	if (first == std::string::npos || last == std::string::npos) {
+		return ;
+	}
+	
+	str = str.substr(first, last - first + 1);
+}
 
 void ConfigsLoader::_expand_environment_variables(std::string &line){
-	size_t envStartPos = line.find_first_of('$');
-	if (envStartPos == line.size() - 1)
+	_trim(line);
+	if (line[line.size() - 1] == '$')
 		throw ConfigsLoader::ConfigsLoaderException("Wrong formating, found $ at end of line.");
-	else if(envStartPos == std::string::npos)
+	size_t envStartPos = line.find_first_of('$');
+	if(envStartPos == std::string::npos)
 		return ;
-	size_t envEndPos = line.find_first_of(' ', envStartPos);
+	size_t envEndPos = line.find_first_of(" \t", envStartPos);
 	std::string toFind = line.substr(envStartPos, envEndPos);
-	if (toFind.at(1) != '{')
+	if (toFind.at(1) != '{' )
 		toFind = toFind.substr(1);
 	else
 		toFind = toFind.substr(2, toFind.find_first_of('}') - 2);
@@ -128,16 +135,34 @@ std::vector<std::string> ConfigsLoader::_expandEnvs(void){
 	int lineCount = 0;
 	for (std::vector<std::string>::iterator it = this->_loadedConfigs.begin(); it != this->_loadedConfigs.end(); it++){
 		ret.push_back(*it);
-		try
-		{
-			this->_expand_environment_variables(ret.back());
-			
-		}
-		catch(const std::exception& e)
-		{
-			std::cerr << "Configuration File " << this->_pathToFile <<" at line: "<< e.what() << '\n';
-		}
-		lineCount++;	
+		this->_expand_environment_variables(ret.back());
+		lineCount++;
+	}
+	return ret;
+}
+
+std::vector<std::string> ConfigsLoader::_removeComments(void){
+	std::vector<std::string> ret(this->_expandedConfigs);
+	for (std::vector<std::string>::iterator line = ret.begin(); line != ret.end(); line++){
+		size_t hashPos = line->find('#');
+		if (hashPos == std::string::npos)
+			continue;
+		*line = line->substr(0, hashPos);
+	}
+	return ret;
+}
+
+const std::vector<std::string> ConfigsLoader::getNoCommentsConfigs(void) const{
+	return this->_noCommentsConfigs;
+}
+
+//not the best solution ever, but it works :P
+std::vector<std::string> ConfigsLoader::_trimAndRemoveEmpty(void){
+	std::vector<std::string> ret;
+	for (std::vector<std::string>::iterator line = this->_noCommentsConfigs.begin(); line != this->_noCommentsConfigs.end(); line++){
+		_trim(*line);
+		if (!line->empty())
+			ret.push_back(*line);
 	}
 	return ret;
 }

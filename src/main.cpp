@@ -76,30 +76,25 @@ static unsigned char daemonize() {
 static int init(int argc, char *argv[], char **envp){
 	try{
 		ArgumentValidator::validateArguments(argc, argv);
+		ArgumentValidator::checkEnvs(envp);
 	}
 	catch(const std::exception& e){
 		std::cerr << "ERROR: " << e.what() << std::endl;
 		return 1;
 	}
-	try{
-		ArgumentValidator::checkEnvs(envp);
-	}
-	catch(const std::exception& e){
-		std::cerr << "ERROR: " << e.what() << std::endl;
-		return 2;
-	}
 	if (shouldDaemonize(argv))
 		if(daemonize())
 			return 4;
+	ConfigsLoader CL(argc, argv, envp);
 	return 0;
 }
 
 int main (int argc, char *argv[], char **envp){
 	int rc = 0;
 	rc |= init(argc, argv, envp);
+	
 	if (rc){
 		return rc;
 	}
-
 	return 0;
 }

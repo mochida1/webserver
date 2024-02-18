@@ -442,6 +442,49 @@ TEST(ConfigsLoader, Constructor01){
 	}
 }
 
+TEST(ConfigsLoader, Constructor02){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/ConfigsLoaderThrowExcept.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try { // tests if default constructor is working as it should. Should throw when parsing config file
+		ConfigsLoader tempInstance(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, true);
+}
+
+TEST(ConfigsLoader, Constructor03){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/ConfigsLoaderComments.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try { // tests if default constructor is working as it should. Should throw when parsing config file
+		ConfigsLoader tempInstance(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+
+	ConfigsLoader instance(argc, argv, environ);
+	{
+		std::vector<std::string> noComments = instance.getNoCommentsConfigs();
+		int i = 0;
+		EXPECT_STREQ(noComments[i++].c_str(), "first line");
+		EXPECT_STREQ(noComments[i++].c_str(), "second line");
+		EXPECT_STREQ(noComments[i++].c_str(), "third line");
+		EXPECT_STREQ(noComments[i++].c_str(), "env01 env02");
+		EXPECT_STREQ(noComments[i++].c_str(), "env03 env04");
+		EXPECT_STREQ(noComments[i++].c_str(), "last line");
+	}
+}
 
 /*
 	-------------------------------------------------------------------

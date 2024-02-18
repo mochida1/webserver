@@ -53,21 +53,27 @@ public:
 	const std::vector<std::string> getConfigsVector(void) const;
 	const std::map<std::string, std::string> getEnvsMap(void) const;
 	const std::vector<std::string> getExpandedConfigs(void) const;
+	const std::vector<std::string> getNoCommentsConfigs(void) const;
 	//---------------------
 protected:
 private:
 	std::map<std::string, std::string> _getRequiredConfigs();
-	std::vector<std::string> _readConfigsFromFile(void);
-	std::string _getPathToFileFromArgv(char *argv[]);
 	std::map<std::string, std::string> _loadEnvsToMap(char **envp);
+	std::string _getPathToFileFromArgv(char *argv[]);
+	std::vector<std::string> _readConfigsFromFile(void);
 	std::vector<std::string> _expandEnvs(void);
 	void _expand_environment_variables(std::string &line);
+	std::vector<std::string> _removeComments(void);
+	std::vector<std::string> _trimAndRemoveEmpty(void);
 
 	int _argc;
 	std::string _pathToFile;
 	std::map<std::string, std::string> _envs;
+	// I KNOW that this is a bad design and eats up memory like crazy. But it's done so for the sake of testing.
 	std::vector<std::string> _loadedConfigs;
 	std::vector<std::string> _expandedConfigs;
+	std::vector<std::string> _noCommentsConfigs;
+	DTO_Configs _DTO_Configs;
 
 	
 	// OCF default constructor
