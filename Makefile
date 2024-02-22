@@ -15,7 +15,7 @@ TEST_LDFLAGS = -lgtest -lgtest_main
 # Lists sources. Manually because of norm...
 MAIN = main_moacir.cpp #main.cpp
 SRC = Webserv.cpp Server.cpp ConfigsLoader.cpp ArgumentValidator.cpp DTO_Configs.cpp \
-	  HTTPRequest.cpp
+	  HTTPRequest.cpp parse_request.cpp
 TEST_MAIN = test_main.cpp
 
 # Names sources
