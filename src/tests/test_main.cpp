@@ -551,6 +551,7 @@ TEST(ConfigsLoader, Constructor05){
 	}
 	EXPECT_EQ(hasThrownException, false);
 
+	std::cerr << "\n_____________TEST________________" << std::endl;
 	ConfigsLoader instance(argc, argv, environ);
 	{
 		std::vector<std::string> noComments = instance.getNoCommentsConfigs();
@@ -610,9 +611,62 @@ TEST(ConfigsLoader, Constructor05){
 		EXPECT_STREQ(noComments[i++].c_str(), "}");
 		EXPECT_STREQ(noComments[i++].c_str(), "}");
 		EXPECT_STREQ(noComments[i++].c_str(), "}");
-		
+	}
+	for (auto it : instance.getConfigs().property) {
+		std::cerr << "[" << it.first << "] Value:[ ";
+		for (auto entry : it.second)
+		 	std:: cerr << entry << " | ";
+		 std::cerr << " ]" << std::endl;
 	}
 }
+
+
+TEST(ConfigsParser, __________){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/mock.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try { // tests if default constructor is working as it should. Should throw when parsing config file
+		ConfigsLoader tempInstance(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+
+	ConfigsLoader instance(argc, argv, environ);
+	try{
+		ConfigsParser::parseConfigs(instance.getConfigs());
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+	
+}
+
+TEST(Configs, argConstructor){
+	int argc = 2;
+	char *arg0 = (char *)("./gtest_websev");
+	char *arg1 = (char *)("conf/mock.conf");
+	char *argv[argc + 1] = {arg0, arg1, NULL};
+	extern char **environ;
+	bool hasThrownException = false;
+	try { // tests if default constructor is working as it should. Should throw when parsing config file
+		Configs configs(argc, argv, environ);
+	}
+	catch(const std::exception& e){
+		hasThrownException = true;
+	}
+	EXPECT_EQ(hasThrownException, false);
+	
+	Configs configs(argc, argv, environ);
+	std::cerr << "----------------------------------------" << std::endl;
+	configs.printDTO();
+}
+
 
 /*
 	-------------------------------------------------------------------

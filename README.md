@@ -17,8 +17,7 @@ A simple HTTP server
 	- Set a default file to answer if the request is a directory.
 	- Execute CGI based on certain file extension (for example .php).
 	- Make it work with POST and GET methods.
-	- Make the route able to accept uploaded files and configure where they should
-be saved.
+	- Make the route able to accept uploaded files and configure where they should be saved.
 
 ∗ Do you wonder what a CGI is?
 ∗ Because you won’t call the CGI directly, use the full path as PATH_INFO.

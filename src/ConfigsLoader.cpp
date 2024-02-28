@@ -175,7 +175,105 @@ const DTO_Configs ConfigsLoader::getConfigs(void) const{
 	return this->_DTO_Configs;
 }
 
+#include <iostream>
+static std::vector<DTO_Configs> _populateLowerNestedContexts(size_t &line, std::vector<std::string> configsVector);
+
 const DTO_Configs ConfigsLoader::_generateDTO(void) const{
 	DTO_Configs ctx;
+	ctx.name = "main";
+	size_t it = 0;
+	// we fill the first level of the DTO because it does not have a context name in the file
+	while (this->_noCommentsConfigs[it].find('{') == std::string::npos && it < this->_noCommentsConfigs.size()) {
+		std::vector<std::string> tokensVector;
+		std::istringstream iss(this->_noCommentsConfigs[it]);
+		std::string sToken;
+		bool token_idx = false;
+		std::string lKey;
+		while (iss >> sToken){
+			if (token_idx == false)
+				lKey = sToken;
+			else
+				tokensVector.push_back(sToken);
+			token_idx = true;
+		}
+		std::pair< std::string, std::vector<std::string> > value(lKey, tokensVector);
+		ctx.property.insert(value);
+		it++;
+	}
+	if (it < this->_noCommentsConfigs.size()) // do not populate context where it's not needed
+		ctx.context = _populateLowerNestedContexts(it, this->_noCommentsConfigs);
 	return ctx;
 }
+
+#include <cassert>
+
+static std::string _getContextName(size_t line, std::vector<std::string> configsVector){
+	return configsVector[line].substr(0, configsVector[line].find_first_of("{"));
+}
+
+
+static std::pair< std::string, std::vector<std::string> > _getPairPropertyFromLine(std::string line){
+	std::vector<std::string> tokensVector;
+		std::istringstream iss(line);
+		std::string sToken;
+		bool token_idx = false;
+		std::string lKey;
+		while (iss >> sToken){
+			if (token_idx == false)
+				lKey = sToken;
+			else
+				tokensVector.push_back(sToken);
+			token_idx = true;
+		}
+	return std::pair< std::string, std::vector<std::string> >(lKey, tokensVector);
+}
+
+static std::vector<DTO_Configs> _populateLowerNestedContexts(size_t &line, std::vector<std::string> configsVector){
+	std::vector<DTO_Configs> returnContext;
+	// we must be sure we're always accessing the line where the context is declared
+	if (configsVector[line].find('{') == std::string::npos){
+		assert(0);
+		return returnContext;
+	}
+	DTO_Configs currContext;
+	currContext.name = _getContextName(line, configsVector);
+	std::cerr << "ctxName: " << currContext.name << std::endl; //pega o nome
+	// std::cerr << "{{ opened braces" << std::endl;
+	bool isBraceOpen = true;
+	line++;
+	// search for this level properties
+	while (line < configsVector.size()){
+		// if a new nested context was found
+		if (configsVector[line].find('{') != std::string::npos  && isBraceOpen == false){
+			currContext.context = _populateLowerNestedContexts(line, configsVector);
+			isBraceOpen = true;
+		}
+		else if (configsVector[line].find('{') != std::string::npos){
+			currContext.name = _getContextName(line, configsVector);
+			line++;
+		}
+		// if we reached the end of a context, adds it to contexts vector
+		else if (configsVector[line].find('}') != std::string::npos){
+			line++;
+			returnContext.push_back(currContext);
+			currContext.name.clear();
+			currContext.property.clear();
+			currContext.context.clear();
+			// std::cerr << "closed braces }}" << std::endl;
+			isBraceOpen = false;
+		}
+		else{ //we fill the current context with it's properties content
+			currContext.property.insert(_getPairPropertyFromLine(configsVector[line]));
+			std::cerr << "PropKey:[" << _getPairPropertyFromLine(configsVector[line]).first << "]\t\tPropValue: { ";
+			for (size_t i = 0; i < _getPairPropertyFromLine(configsVector[line]).second.size(); i++){
+				std::cerr << _getPairPropertyFromLine(configsVector[line]).second[i] << " ";
+			}
+			std::cerr << "}" << std::endl;
+			line++;
+		}
+	}
+	return returnContext;
+}
+
+
+

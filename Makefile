@@ -14,7 +14,9 @@ TEST_LDFLAGS = -lgtest -lgtest_main
 
 # Lists sources. Manually because of norm...
 MAIN = main.cpp
-SRC = Webserv.cpp Server.cpp ConfigsLoader.cpp ArgumentValidator.cpp DTO_Configs.cpp
+CONFIGS_SRC = ConfigsLoader.cpp ArgumentValidator.cpp DTO_Configs.cpp ConfigsParser.cpp Configs.cpp
+SRC = Webserv.cpp Server.cpp 
+SRC += $(CONFIGS_SRC)
 TEST_MAIN = test_main.cpp
 
 # Names sources
