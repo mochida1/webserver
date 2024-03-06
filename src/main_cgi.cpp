@@ -8,7 +8,8 @@ int main()
     std::string path = "/usr/lib/cgi-bin/";
     char *env[] = {strdup(envPath.c_str()), NULL};
     //char *env[] = {NULL};
-    execScript(path, fileName, env);
+    //execScript(path, fileName, env);
+    cgiFork(path, fileName, env);
 
     return 0;
 }
