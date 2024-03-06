@@ -4,9 +4,8 @@
 #include <cerrno>
 
 
-int    execScript(std::string  fileName, char **env)
+int    execScript(std::string path, std::string  fileName, char **env)
 {
-    std::string path = "/usr/lib/cgi-bin/";
     char *argv[] = {NULL};
 
     chdir(path.c_str());

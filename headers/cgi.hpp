@@ -1,4 +1,4 @@
 
 #include <string>
 
-int    execScript(std::string  fileName, char **env);
+int    execScript(std::string path, std::string  fileName, char **env);
