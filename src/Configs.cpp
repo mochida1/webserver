@@ -75,6 +75,7 @@ void Configs::printDTO(void){
 	int level = 0;
 	_printContextName(this->_dto, level);
 	_printContextProps(this->_dto, level);
+	std::cerr << "LVL0 context size: " << this->_dto.context.size() << std::endl;
 	_recPrintDTO(this->_dto.context, level + 1);
 }
 

@@ -177,6 +177,7 @@ const DTO_Configs ConfigsLoader::getConfigs(void) const{
 
 #include <iostream>
 static std::vector<DTO_Configs> _populateLowerNestedContexts(size_t &line, std::vector<std::string> configsVector);
+static DTO_Configs _getNestedContext(size_t &line, std::vector<std::string> configsVector);
 
 const DTO_Configs ConfigsLoader::_generateDTO(void) const{
 	DTO_Configs ctx;
@@ -200,6 +201,7 @@ const DTO_Configs ConfigsLoader::_generateDTO(void) const{
 		ctx.property.insert(value);
 		it++;
 	}
+
 	if (it < this->_noCommentsConfigs.size()) // do not populate context where it's not needed
 		ctx.context = _populateLowerNestedContexts(it, this->_noCommentsConfigs);
 	return ctx;
@@ -228,50 +230,94 @@ static std::pair< std::string, std::vector<std::string> > _getPairPropertyFromLi
 	return std::pair< std::string, std::vector<std::string> >(lKey, tokensVector);
 }
 
+static bool isContextStart(std::string configsVectorLine){
+	 if (configsVectorLine.find('{') != std::string::npos) {
+		return true;
+	}
+	return false;
+}
+
+static bool isContextEnd(std::string configsVectorLine){
+	 if (configsVectorLine.find('}') != std::string::npos) {
+		return true;
+	}
+	return false;
+}
+
+static bool isContextProperty(std::string configsVectorLine){
+	 if (configsVectorLine.find(';') == configsVectorLine.size() - 1) {
+		std::cerr << "found property: " << configsVectorLine << std::endl;
+		return true;
+	}
+	return false;
+}
+
+static DTO_Configs _getNestedContext(size_t &line, std::vector<std::string> configsVector) {
+	DTO_Configs currCtx;
+	int openBraces = 0;
+	while (line < configsVector.size()){
+		if (isContextStart(configsVector[line]) == true && openBraces == 0){
+			openBraces++;
+			std::cerr << "getCtxName: " << configsVector[line] << std::endl;
+			currCtx.name = _getContextName(line, configsVector);
+			line++;
+		}
+		else if (isContextStart(configsVector[line]) == true && openBraces > 0){
+			std::cerr << "getNestedCtx: " << configsVector[line] << std::endl;
+			currCtx.context.push_back(_getNestedContext(line, configsVector));
+		}
+		else if(isContextProperty(configsVector[line])){
+			currCtx.property.insert(_getPairPropertyFromLine(configsVector[line]));
+			line++;
+		}
+		else if(isContextEnd(configsVector[line]) && openBraces == 1){
+			line++;
+			return currCtx;
+		}
+		else if(isContextEnd(configsVector[line]) && openBraces != 1){
+			std::cerr << "BREAK ME!" << std::endl;
+			assert(0);
+		}
+		else{
+			std::cerr << "WTF?!!" << std::endl;
+			line++;
+		}
+	}
+	return currCtx;
+}
+
+
 static std::vector<DTO_Configs> _populateLowerNestedContexts(size_t &line, std::vector<std::string> configsVector){
 	std::vector<DTO_Configs> returnContext;
-	// we must be sure we're always accessing the line where the context is declared
-	if (configsVector[line].find('{') == std::string::npos){
-		assert(0);
-		return returnContext;
-	}
 	DTO_Configs currContext;
-	currContext.name = _getContextName(line, configsVector);
-	std::cerr << "ctxName: " << currContext.name << std::endl; //pega o nome
-	// std::cerr << "{{ opened braces" << std::endl;
-	bool isBraceOpen = true;
-	line++;
-	// search for this level properties
-	while (line < configsVector.size()){
-		// if a new nested context was found
-		if (configsVector[line].find('{') != std::string::npos  && isBraceOpen == false){
-			currContext.context = _populateLowerNestedContexts(line, configsVector);
-			isBraceOpen = true;
-		}
-		else if (configsVector[line].find('{') != std::string::npos){
+	bool isCurrContext = true;
+
+	while(line < configsVector.size()){
+		if (isContextStart(configsVector[line]) == true && isCurrContext == true){
 			currContext.name = _getContextName(line, configsVector);
-			line++;
+			std::cerr << "popLow ctxName: " << configsVector[line] << std::endl;
+			isCurrContext = false;
 		}
-		// if we reached the end of a context, adds it to contexts vector
-		else if (configsVector[line].find('}') != std::string::npos){
-			line++;
+		else if (isContextStart(configsVector[line]) == true && isCurrContext == false){
+			std::cerr << "popLow nestedCtX: " << configsVector[line] << std::endl;
+			currContext.context.push_back(_getNestedContext(line, configsVector));
+			continue;
+		}
+		if (isContextEnd(configsVector[line]) && isCurrContext == false){
+			std::cerr << "popLow EndCtx: " << configsVector[line] << std::endl;
 			returnContext.push_back(currContext);
+			currContext.context.clear();
 			currContext.name.clear();
 			currContext.property.clear();
-			currContext.context.clear();
-			// std::cerr << "closed braces }}" << std::endl;
-			isBraceOpen = false;
+			isCurrContext = true;
 		}
-		else{ //we fill the current context with it's properties content
+		if (isContextProperty(configsVector[line])){
 			currContext.property.insert(_getPairPropertyFromLine(configsVector[line]));
-			std::cerr << "PropKey:[" << _getPairPropertyFromLine(configsVector[line]).first << "]\t\tPropValue: { ";
-			for (size_t i = 0; i < _getPairPropertyFromLine(configsVector[line]).second.size(); i++){
-				std::cerr << _getPairPropertyFromLine(configsVector[line]).second[i] << " ";
-			}
-			std::cerr << "}" << std::endl;
-			line++;
 		}
+		line++;
 	}
+
+	std::cerr << "returning from _populateLowerNestedContexts" << std::endl;
 	return returnContext;
 }
 
