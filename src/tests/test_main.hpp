@@ -8,6 +8,8 @@
 #include "Webserv.hpp"
 #include "ArgumentValidator.hpp"
 #include "ConfigsLoader.hpp"
+#include "ConfigsParser.hpp"
+#include "Configs.hpp"
 #include "Errors_webserv.hpp"
 #include "Constraints_webserv.hpp"
 #include <cstring>

@@ -11,7 +11,7 @@
 struct DTO_Configs
 {
 	std::string name;
-	std::map< std::string, std::vector<std::string> > property;
+	std::multimap< std::string, std::vector<std::string> > property;
 	std::vector<DTO_Configs> context;
 };
 

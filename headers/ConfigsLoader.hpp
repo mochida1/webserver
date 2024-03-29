@@ -10,6 +10,7 @@
 #include <exception>
 #include <stdexcept>
 #include <fstream>
+#include <sstream>
 #include "Constraints_webserv.hpp"
 #include "DTO_Configs.hpp"
 
