@@ -1,0 +1,13 @@
+name: WebservUnitTests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: debian-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile tests
+        run: make tests
