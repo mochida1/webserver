@@ -68,7 +68,7 @@ $(TEST_BUILDDIR)/%.o: %.cpp
 
 all: $(NAME)
 
-test: cls $(NAME_TEST) $(NAME)
+test: $(NAME_TEST) $(NAME)
 	@echo "--------- Running tests ----------"
 	@./tools/runtests.sh
 
