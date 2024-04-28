@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   build:
+    - name: Webserv Unit Testing
 
     runs-on: ubuntu-latest
 
