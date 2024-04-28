@@ -4,8 +4,7 @@ on: [push]
 
 jobs:
   build:
-    - name: Webserv Unit Testing
-
+    name: Build & Gtest
     runs-on: ubuntu-latest
 
     steps:
