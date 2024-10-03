@@ -1,7 +1,7 @@
 name: WebservUnitTests
 
 on: workflow_dispatch
-    push
+    [push]
 
 jobs:
   build:
